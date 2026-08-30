@@ -19,7 +19,14 @@ function getGenAI(): GoogleGenAI {
     if (!apiKey) {
       console.warn('GEMINI_API_KEY environment variable is missing.');
     }
-    aiClient = new GoogleGenAI({ apiKey: apiKey || '' });
+    aiClient = new GoogleGenAI({
+      apiKey: apiKey || '',
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
   }
   return aiClient;
 }
@@ -110,7 +117,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: process.env.GEMINI_MODEL || 'gemini-3.7-flash',
   });
 });
 
@@ -125,7 +132,7 @@ app.post('/api/gemini/chat', authenticateFirebaseUser, async (req: Authenticated
     }
 
     const ai = getGenAI();
-    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    const model = process.env.GEMINI_MODEL || 'gemini-3.7-flash';
 
     // Format history for Gemini SDK
     const contents: any[] = [];
@@ -208,7 +215,7 @@ app.post('/api/gemini/action', authenticateFirebaseUser, async (req: Authenticat
     }
 
     const ai = getGenAI();
-    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    const model = process.env.GEMINI_MODEL || 'gemini-3.7-flash';
 
     const conversationTranscript = messages
       .map((m: any) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
@@ -359,7 +366,7 @@ app.post('/api/gemini/meta-insights', authenticateFirebaseUser, async (req: Auth
     }
 
     const ai = getGenAI();
-    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    const model = process.env.GEMINI_MODEL || 'gemini-3.7-flash';
 
     const journalContext = journalSummaries
       .map((j: any, i: number) => `Journal ${i + 1} [${j.category || 'General'}] "${j.title}": ${j.summary || j.snippet || 'No summary'}`)
